@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TASKR — A premium productivity todo app with timers and analytics">
+  <title>TASKR — Do It.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Stars Layer -->
+  <div id="stars-layer" style="position:fixed;inset:0;pointer-events:none;z-index:0;"></div>
+
+  <!-- Nebula Blobs -->
+  <div class="nebula n1"></div>
+  <div class="nebula n2"></div>
+  <div class="nebula n3"></div>
+  <div class="nebula n4"></div>
+
+  <!-- Floating Planets -->
+  <div class="planet p1"></div>
+  <div class="planet p2"></div>
+  <div class="planet p3"></div>
+
+  <!-- Shooting Stars -->
+  <div class="shooting-star ss1"></div>
+  <div class="shooting-star ss2"></div>
+  <div class="shooting-star ss3"></div>
+
+  <div class="app">
+    <header>
+      <div class="header-top">
+        <h1>Wakey Wakey<span></span></h1>
+      </div>
+      <p class="tagline">//by HEMANT</p>
+      <div class="stats-bar" id="statsBar"></div>
+    </header>
+
+    <div class="add-form">
+      <div class="form-row1">
+        <input class="task-input" id="taskInput" type="text" placeholder="What needs to be done?" />
+      </div>
+      <div class="form-row2">
+        <select id="prioritySelect">
+          <option value="medium">⚡ Medium</option>
+          <option value="high">🔴 High</option>
+          <option value="low">🟢 Low</option>
+        </select>
+        <select id="categorySelect">
+          <option value="personal">👤 Personal</option>
+          <option value="work">💼 Work</option>
+          <option value="study">📚 Study</option>
+          <option value="health">❤️ Health</option>
+          <option value="other">📌 Other</option>
+        </select>
+        <input type="date" id="dueDateInput" />
+        <button class="add-btn" onclick="addTask()">ADD</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input class="search-input" id="searchInput" placeholder="Search tasks..." oninput="renderTasks()" />
+      </div>
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" data-filter="all"    onclick="setFilter('all', this)">All</button>
+        <button class="filter-tab"        data-filter="active" onclick="setFilter('active', this)">Active</button>
+        <button class="filter-tab"        data-filter="done"   onclick="setFilter('done', this)">Done</button>
+      </div>
+    </div>
+
+    <div class="cat-filters" id="catFilters"></div>
+    <div id="taskContainer"></div>
+
+  </div>
+
+  <!-- STATS & GRAPH SECTION -->
+  <div class="graph-section" style="max-width:780px;margin:0 auto;padding: 0 24px 80px;">
+
+    <!-- Streak banner -->
+    <div class="streak-banner" id="streakBanner">
+      <span class="streak-fire">🔥</span>
+      <span class="streak-count" id="streakCount">0</span>
+      <span class="streak-label">day streak</span>
+    </div>
+
+    <!-- Graph tabs -->
+    <div class="graph-tabs">
+      <button class="graph-tab active" onclick="switchGraph('daily', this)">📊 Daily Tasks</button>
+      <button class="graph-tab" onclick="switchGraph('pomodoro', this)">🍅 Pomodoro</button>
+      <button class="graph-tab" onclick="switchGraph('category', this)">🏷 Categories</button>
+    </div>
+
+    <!-- Daily Tasks — Bar Chart -->
+    <div class="graph-panel" id="gp-daily">
+      <div class="graph-title">Tasks Completed — Last 7 Days</div>
+      <canvas id="dailyChart"></canvas>
+    </div>
+
+    <!-- Pomodoro — Line Graph -->
+    <div class="graph-panel" id="gp-pomodoro" style="display:none">
+      <div class="graph-title">Pomodoro Sessions — Last 7 Days</div>
+      <canvas id="pomChart"></canvas>
+    </div>
+
+    <!-- Category — Bar Chart -->
+    <div class="graph-panel" id="gp-category" style="display:none">
+      <div class="graph-title">Tasks by Category</div>
+      <canvas id="catChart"></canvas>
+    </div>
+
+  </div>
+
+  <!-- AI AGENT FAB -->
+  <button class="agent-fab" onclick="toggleAgent()">✦</button>
+
+  <!-- AI AGENT PANEL -->
+  <div class="agent-panel" id="agentPanel">
+
+    <div class="agent-header">
+      <span class="agent-title">✦ TASKR AI</span>
+      <button class="agent-close" onclick="toggleAgent()">✕</button>
+    </div>
+
+    <!-- Chat / Timer tabs -->
+    <div class="agent-tabs">
+      <button class="agent-tab active" onclick="switchTab('chat', this)">💬 Chat</button>
+      <button class="agent-tab"        onclick="switchTab('timer', this)">⏱ Timer</button>
+    </div>
+
+    <!-- CHAT -->
+    <div class="agent-messages" id="agentMessages"></div>
+
+    <!-- TIMER -->
+    <div class="agent-timer-panel" id="agentTimerPanel" style="display:none">
+      <div class="timer-mode-tabs">
+        <button class="tmode active" onclick="setTimerMode('pomodoro', this)">🍅 Pomodoro</button>
+        <button class="tmode"        onclick="setTimerMode('countdown', this)">⏳ Countdown</button>
+        <button class="tmode"        onclick="setTimerMode('stopwatch', this)">⌚ Stopwatch</button>
+      </div>
+
+      <!-- Pomodoro -->
+      <div class="tpanel" id="tp-pomodoro">
+        <div class="timer-phase" id="pomPhase">FOCUS</div>
+        <div class="timer-display" id="pomDisplay">25:00</div>
+        <div class="timer-info" id="pomInfo">Session 1 • 4 rounds</div>
+        <div class="timer-btns">
+          <button class="tbtn" onclick="pomControl()">▶ Start</button>
+          <button class="tbtn tbtn-ghost" onclick="pomReset()">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- Countdown -->
+      <div class="tpanel" id="tp-countdown" style="display:none">
+        <div class="timer-display" id="cdDisplay">00:00</div>
+        <div class="cd-inputs" id="cdInputs">
+          <input class="cd-inp" id="cdMin" type="number" min="0" max="99" placeholder="mm" />
+          <span class="cd-sep">:</span>
+          <input class="cd-inp" id="cdSec" type="number" min="0" max="59" placeholder="ss" />
+        </div>
+        <div class="timer-btns">
+          <button class="tbtn" onclick="cdControl()">▶ Start</button>
+          <button class="tbtn tbtn-ghost" onclick="cdReset()">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- Stopwatch -->
+      <div class="tpanel" id="tp-stopwatch" style="display:none">
+        <div class="timer-display" id="swDisplay">00:00.0</div>
+        <div class="timer-btns">
+          <button class="tbtn" onclick="swControl()">▶ Start</button>
+          <button class="tbtn tbtn-ghost" onclick="swReset()">↺ Reset</button>
+        </div>
+        <div class="sw-laps" id="swLaps"></div>
+      </div>
+    </div>
+
+    <!-- INPUT (chat only) -->
+    <div class="agent-input-wrap" id="agentInputWrap">
+      <input class="agent-input" id="agentInput" placeholder="Ask me anything..." />
+      <button class="agent-send" onclick="sendMessage()">↑</button>
+    </div>
+
+  </div><!-- end agent-panel -->
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Stars injection script -->
+  <script>
+    (function(){
+      const layer = document.getElementById('stars-layer');
+      const cfg = [{size:1,count:80,minOp:0.15},{size:1.5,count:40,minOp:0.25},{size:2,count:18,minOp:0.4},{size:2.5,count:8,minOp:0.6}];
+      cfg.forEach(({size,count,minOp})=>{
+        for(let i=0;i<count;i++){
+          const s=document.createElement('div');
+          const dur=(2.5+Math.random()*3).toFixed(1)+'s';
+          const delay=(Math.random()*5).toFixed(1)+'s';
+          s.style.cssText=`position:absolute;width:${size}px;height:${size}px;border-radius:50%;background:#fff;top:${Math.random()*100}%;left:${Math.random()*100}%;opacity:${minOp};animation:starTwinkle ${dur} ease-in-out ${delay} infinite;`;
+          layer.appendChild(s);
+        }
+      });
+    })();
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
