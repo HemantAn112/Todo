@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Orbitron:wght@700;900&display=swap');
 
 :root {
   --bg: #020010;
@@ -184,21 +184,38 @@ header { margin-bottom: 48px; }
 }
 
 h1 {
-  font-family: 'Space Mono', monospace;
-  font-size: clamp(2.2rem, 6vw, 3.5rem);
-  font-weight: 700;
-  letter-spacing: -2px;
-  color: #e0deff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #c8b6ff 0%, #8f6fff 40%, #e040fb 80%, #ff6ec7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 18px rgba(143,111,255,0.55));
+  animation: titlePulse 4s ease-in-out infinite;
 }
-h1 span { color: var(--accent); }
+h1 span { 
+  background: linear-gradient(135deg, #ff6ec7, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes titlePulse {
+  0%, 100% { filter: drop-shadow(0 0 14px rgba(143,111,255,0.5)); }
+  50%       { filter: drop-shadow(0 0 30px rgba(200,150,255,0.8)); }
+}
 
 .tagline {
   font-family: 'Space Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--text3);
-  letter-spacing: 3px;
+  font-size: 0.72rem;
+  color: #9d7aff;
+  letter-spacing: 5px;
   text-transform: uppercase;
   margin-bottom: 28px;
+  opacity: 0.85;
+  text-shadow: 0 0 12px rgba(143,111,255,0.4);
 }
 
 .stats-bar { display: flex; gap: 24px; flex-wrap: wrap; }
